@@ -1,0 +1,2 @@
+defmodule Askie do
+end
