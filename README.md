@@ -1,6 +1,9 @@
-# Askie
+# Alexa Skills Kit in Elixir aka ASKiE (_pun intended_)
 
-**TODO: Add description**
+[Alexa Skills Kit](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/getting-started-guide)
+is Amazon's developer platform creating new functionality for use by the very impressive hardware,
+Amazon Echo. While Amazon provides a fully featured java sdk, and there are several impressive
+node sdks, for some bizarre reason one didn't exist for Elixir. Until now.
 
 ## Installation
 
