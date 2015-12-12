@@ -17,8 +17,9 @@ defmodule Askie.Mixfile do
   end
 
   defp deps do
-    [{:plug, "~> 1.0"},
-     {:cowboy, "~> 1.0"}]
+    [{:cowboy, "~> 1.0"},
+     {:plug, "~> 1.0"},
+     {:timex, "~>0.19.5"}]
   end
 
   def package do
