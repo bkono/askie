@@ -18,6 +18,7 @@ defmodule Askie.Mixfile do
 
   defp deps do
     [{:cowboy, "~> 1.0"},
+     {:poison, "~>1.3"},
      {:plug, "~> 1.0"},
      {:timex, "~>0.19.5"}]
   end

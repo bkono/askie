@@ -13,11 +13,14 @@ defmodule Askie.Security.InboundRequestValidation do
     end
   end
 
+  def application_id_check(%Plug.Conn{} = conn, _opts) do
+    conn |> send_resp(401, "invalid ask request: no application id provided") |> halt
+  end
+
   def replay_attack_check(%Plug.Conn{params: %{"request" => 
       %{"timestamp" => timestamp}}} = conn, _opts) do
     {:ok, parsed} = timestamp |> DateFormat.parse("{ISOz}")
-    oldest_allowed = Date.now |> Date.subtract(Time.to_timestamp(replay_attack_tolerance, :secs))
-    if first_date_older?(oldest_allowed, parsed) do
+    if timestamp_within_tolerance?(parsed) do
       conn
     else
       Logger.warn """
@@ -26,6 +29,15 @@ defmodule Askie.Security.InboundRequestValidation do
       """
       conn |> send_resp(401, "") |> halt
     end
+  end
+
+  def replay_attack_check(%Plug.Conn{} = conn, _opts) do
+    conn |> send_resp(401, "invalid ask request: no timestamp provided") |> halt
+  end
+
+  def timestamp_within_tolerance?(timestamp) do
+    oldest_allowed = Date.now |> Date.subtract(Time.to_timestamp(replay_attack_tolerance, :secs))
+    first_date_older?(oldest_allowed, timestamp) && first_date_older?(timestamp, Date.now)
   end
 
   def first_date_older?(first, second) do

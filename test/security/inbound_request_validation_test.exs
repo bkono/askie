@@ -22,20 +22,33 @@ defmodule Askie.Security.InboundRequestValidationTest do
     |> assert_unchanged(conn)
   end
 
-  test "replay_attack_check rejects on older than 30s" do
+  test "replay_attack_check rejects on older than tolerance" do
     conn = conn(:get, "/hello", %{"request" => %{"timestamp" => replay_timestamp(1)}})
 
     InboundRequestValidation.replay_attack_check(conn, %{})
     |> assert_unauthorized
   end
 
-  test "replay_attack_check passes on less than 30s" do
-    conn = conn(:get, "/hello", %{"request" => %{"timestamp" => replay_timestamp(-1) }})
+  test "replay_attack_check rejects timestamps in the future" do
+    conn = conn(:get, "/hello", %{"request" => %{"timestamp" => future_time}})
+
+    InboundRequestValidation.replay_attack_check(conn, %{})
+    |> assert_unauthorized
+  end
+
+  test "replay_attack_check passes on less than tolerance" do
+    conn = conn(:get, "/hello", %{"request" => %{"timestamp" => replay_timestamp(-3) }})
 
     InboundRequestValidation.replay_attack_check(conn, %{})
     |> assert_unchanged(conn)
   end
 
+
+  defp future_time do
+    seconds_to_add = Time.to_timestamp(120, :secs)
+    {:ok, timestamp} = Date.now |> Date.add(seconds_to_add) |> DateFormat.format("{ISOz}")
+    timestamp
+  end
   defp replay_timestamp(modify_seconds) do
     subtracted_seconds = Time.to_timestamp(
                          InboundRequestValidation.replay_attack_tolerance + modify_seconds, :secs)
